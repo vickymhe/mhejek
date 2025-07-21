@@ -23,6 +23,12 @@ client = Client(API_KEY, API_SECRET)
 def get_klines_data(symbol, interval, start_str, end_str=None):
     """Mengambil data Klines (OHLCV) historis."""
     print(f"Mengambil data Klines untuk {symbol} ({interval})...")
+    if "ago" in start_str:
+        # Handle relative time like "2 days ago UTC"
+        days = int(start_str.split(" ")[0])
+        start_dt = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+        start_str = start_dt.strftime('%Y-%m-%d %H:%M:%S')
+
     klines = client.get_historical_klines(symbol, interval, start_str, end_str)
     df = pd.DataFrame(klines, columns=[
         'Open time', 'Open', 'High', 'Low', 'Close', 'Volume',
@@ -48,7 +54,15 @@ def get_open_interest_data(symbol, interval_str, start_str): # Tambahkan start_s
     # karena API memiliki batasan max data points per request
 
     # Konversi start_str ke milidetik
-    start_ms = int(datetime.datetime.strptime(start_str, "%d %b %Y %H:%M:%S").timestamp() * 1000) if " " in start_str else client.get_server_time() - 2 * 24 * 60 * 60 * 1000
+    if "ago" in start_str:
+        # Handle relative time like "2 days ago UTC"
+        days = int(start_str.split(" ")[0])
+        start_dt = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+    else:
+        # Handle absolute time
+        start_dt = datetime.datetime.strptime(start_str, '%Y-%m-%d %H:%M:%S')
+
+    start_ms = int(start_dt.timestamp() * 1000)
 
 
     oi_data = client.futures_open_interest_hist(symbol=symbol, period=interval_str, startTime=start_ms)
@@ -63,7 +77,16 @@ def get_open_interest_data(symbol, interval_str, start_str): # Tambahkan start_s
 def get_long_short_ratio_data(symbol, period_str, start_str): # Tambahkan start_str
     """Mengambil data Long/Short Ratio (Accounts dan Positions)."""
     print(f"Mengambil data Long/Short Ratio untuk {symbol} ({period_str})...")
-    start_ms = int(datetime.datetime.strptime(start_str, "%d %b %Y %H:%M:%S").timestamp() * 1000) if " " in start_str else client.get_server_time() - 2 * 24 * 60 * 60 * 1000
+    if "ago" in start_str:
+        # Handle relative time like "2 days ago UTC"
+        days = int(start_str.split(" ")[0])
+        start_dt = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+    else:
+        # Handle absolute time
+        start_dt = datetime.datetime.strptime(start_str, '%Y-%m-%d %H:%M:%S')
+
+    start_ms = int(start_dt.timestamp() * 1000)
+
 
     # Top Trader Account Ratio
     ls_accounts = client.futures_top_longshort_account_ratio(symbol=symbol, period=period_str, startTime=start_ms)
