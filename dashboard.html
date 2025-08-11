@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crypto Trading Bot Dashboard</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        .endpoint { background: #f8f9fa; padding: 15px; margin: 10px 0; border-left: 4px solid #3498db; border-radius: 5px; }
+        .method { font-weight: bold; color: white; padding: 4px 8px; border-radius: 4px; margin-right: 10px; }
+        .get { background: #27ae60; }
+        .post { background: #e74c3c; }
+        .description { margin: 5px 0; color: #7f8c8d; }
+        .symbols { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0; }
+        .symbol { background: #3498db; color: white; padding: 3px 8px; border-radius: 15px; font-size: 12px; }
+        .status { padding: 10px; background: #d5f4e6; border-radius: 5px; margin: 20px 0; }
+        .footer { margin-top: 30px; text-align: center; color: #95a5a6; }
+        .try-btn { background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+        .try-btn:hover { background: #2980b9; }
+        .trained { background: #27ae60; }
+        .pending { background: #95a5a6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Crypto Trading Bot Dashboard</h1>
+        
+        <div class="status">
+            ✅ <strong>System Status:</strong> Online | 
+            📊 <strong>Supported Pairs:</strong> 32 symbols |
+            🤖 <strong>AI Models:</strong> {{trained_count}}/{{total_count}} trained |
+            🧠 <strong>LLM:</strong> Ollama Ready |
+            🔥 <strong>Data Source:</strong> Live Binance API
+        </div>
+        
+        <div style="background: #d1ecf1; border-left: 4px solid #bee5eb; padding: 15px; margin: 15px 0; border-radius: 5px;">
+            <strong>🔥 Production Mode Active</strong><br>
+            Currently using REAL market data directly from Binance API:
+            <ul style="margin: 10px 0;">
+                <li>✅ Live OHLCV data from Binance futures</li>
+                <li>✅ Real-time Open Interest and volume metrics</li>
+                <li>✅ Top trader long/short ratios</li>
+                <li>✅ All data stored in PostgreSQL database</li>
+                <li>✅ Models trained with actual market patterns</li>
+            </ul>
+            <strong>Current capabilities:</strong> Real-time signal generation, live market analysis, paper trading with actual price movements.
+        </div>
+
+        <h2>📈 Trading Pairs</h2>
+        <div style="margin: 10px 0;">
+            <strong>✅ Trained Models ({{trained_count}}):</strong>
+            <div class="symbols" style="margin: 5px 0;">
+                {{trained_html}}
+            </div>
+            <strong>⏳ Pending Training ({{pending_count}}):</strong>
+            <div class="symbols" style="margin: 5px 0;">
+                {{pending_html}}
+            </div>
+        </div>
+
+        <h2>🔌 API Endpoints</h2>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span><strong>/health</strong>
+            <button class="try-btn" onclick="window.open('/health', '_blank')">Try</button>
+            <div class="description">System health check and available symbols</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span><strong>/docs</strong>
+            <button class="try-btn" onclick="window.open('/docs', '_blank')">Try</button>
+            <div class="description">Interactive API documentation (Swagger UI)</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span><strong>/models/status</strong>
+            <button class="try-btn" onclick="window.open('/models/status', '_blank')">Try</button>
+            <div class="description">Get detailed model training status</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span><strong>/system/info</strong>
+            <button class="try-btn" onclick="window.open('/system/info', '_blank')">Try</button>
+            <div class="description">System information and data source status</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span><strong>/papertrades</strong>
+            <button class="try-btn" onclick="window.open('/papertrades', '_blank')">Try</button>
+            <div class="description">List recent paper trades (last 100)</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span><strong>/signal?symbol=BTCUSDT</strong>
+            <div class="description">Generate trading signal for specified symbol using XGBoost + LLM</div>
+            <div style="margin-top: 8px; font-size: 12px;">
+                <span style="color: #27ae60;">✅ Ready for: BTCUSDT, ETHUSDT, SOLUSDT</span><br>
+                <span style="color: #e74c3c;">⚠️ Need training for other pairs</span>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span><strong>/train?symbol=BTCUSDT</strong>
+            <div class="description">Train XGBoost model for specified symbol (walk-forward validation)</div>
+            <div style="margin-top: 8px; font-size: 12px;">
+                <span style="color: #27ae60;">🔥 Training with REAL Binance market data</span><br>
+                <span style="color: #e74c3c;">📈 Live price movements, actual volatility patterns</span>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span><strong>/binance/ingest?symbol=BTCUSDT&days=7</strong>
+            <div class="description">Ingest real market data from Binance API for specific symbol</div>
+            <div style="margin-top: 8px; font-size: 12px;">
+                <span style="color: #27ae60;">🔥 Fetch live OHLCV, OI, and trader metrics from Binance</span><br>
+                <span style="color: #3498db;">💾 Store in PostgreSQL for model training</span>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span><strong>/binance/ingest_all?days=7</strong>
+            <div class="description">Bulk ingest real market data for ALL configured symbols</div>
+            <div style="margin-top: 8px; font-size: 12px;">
+                <span style="color: #e74c3c;">🚀 Ingest 32 symbols at once (may take 1-2 minutes)</span><br>
+                <span style="color: #f39c12;">⚡ Updates entire database with fresh market data</span>
+            </div>
+        </div>
+
+        <h2>⚡ Quick Actions</h2>
+        <div style="margin: 20px 0;">
+            <button class="try-btn" onclick="checkHealth()">Check System Health</button>
+            <button class="try-btn" onclick="viewTrades()">View Paper Trades</button>
+            <button class="try-btn" onclick="window.open('/docs', '_blank')">Open API Docs</button>
+        </div>
+
+        <h2>📊 System Architecture</h2>
+        <div style="background: #d1ecf1; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #17a2b8;">
+            <strong>🔥 Complete Data Flow Active:</strong><br>
+            <div style="font-size: 14px; margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
+                📡 <strong>Binance API</strong> → 
+                💾 <strong>InfluxDB</strong> → 
+                🔧 <strong>Feature Engineering</strong> → 
+                🤖 <strong>XGBoost</strong> → 
+                🧠 <strong>Ollama LLM</strong> → 
+                📈 <strong>Paper Trading</strong>
+            </div>
+            <ul style="margin: 10px 0; font-size: 13px;">
+                <li>✅ Real-time market data ingestion from Binance futures</li>
+                <li>✅ Time-series storage in InfluxDB with proper measurements</li>
+                <li>✅ Advanced feature engineering (RSI, volatility, OI, trader ratios)</li>
+                <li>✅ ML signal generation with walk-forward validation</li>
+                <li>✅ AI-powered trading plan analysis via Ollama LLM</li>
+                <li>✅ Automated paper trading with risk management</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>🤖 AI-Powered Crypto Trading System | Built with FastAPI + XGBoost + Ollama</p>
+        </div>
+    </div>
+
+    <script>
+        function checkHealth() {
+            fetch('/health')
+                .then(r => r.json())
+                .then(data => alert('Status: ' + data.status + '\nSymbols: ' + data.symbols.length))
+                .catch(e => alert('Error: ' + e));
+        }
+        
+        function viewTrades() {
+            fetch('/papertrades')
+                .then(r => r.json())
+                .then(data => alert('Paper Trades: ' + data.length + ' found'))
+                .catch(e => alert('Error: ' + e));
+        }
+    </script>
+</body>
+</html>
